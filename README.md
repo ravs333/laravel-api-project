@@ -22,6 +22,16 @@ via SSH
 git clone git@github.com:ravs333/laravel-api-project.git
 ```
 
+After cloning, install dependencies using composer:
+```
+php composer update 
+```
+
+Install Database Tables Using following command:
+```
+php artisan migrate 
+```
+
 
 ## Security Vulnerabilities
 
