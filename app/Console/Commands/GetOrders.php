@@ -46,7 +46,6 @@ class GetOrders extends Command
         $marketplaceBaseURL = env('DESPATCH_CLOUD_MARKETPLACE_API_URL');
         $marketplaceAPIKEY = env('DESPATCH_CLOUD_MARKETPLACE_API_KEY');
         $apiEndpoint = env('DESPATCH_CLOUD_MARKETPLACE_ORDER_ENDPOINT');
-        $apiMethod = 'GET';
 
         $url = $marketplaceBaseURL . $apiEndpoint . '?api_key=' . $marketplaceAPIKEY;
 
