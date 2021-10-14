@@ -54,8 +54,17 @@ Install Database Tables Using following command:
 php artisan migrate 
 ```
 
-## Usage
+Create Log Files in storage/logs/ folder
+```
+1. api.log
+2. laravel.log 
+```
 
+## Usage
+Start Scheduler by running following command:
+```
+php artisan schedule:run
+```
 
 
 ## Security Vulnerabilities
