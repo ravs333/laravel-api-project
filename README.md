@@ -22,15 +22,40 @@ via SSH
 git clone git@github.com:ravs333/laravel-api-project.git
 ```
 
+
 After cloning, install dependencies using composer:
 ```
 php composer update 
 ```
 
+
+Setup .env file with correct database and API configurations. See sample .env file below:
+```
+APP_NAME=<YOUR APP NAME>
+APP_ENV=local
+APP_KEY=<YOUR APP KEY>
+APP_DEBUG=true
+APP_URL=<YOUR APP URL>
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=<DATABASE NAME>
+DB_USERNAME=<DATABASE USER>
+DB_PASSWORD=<DATABASE PASS>
+
+DESPATCH_CLOUD_MARKETPLACE_API_KEY= <YOUR API KEY>
+DESPATCH_CLOUD_MARKETPLACE_API_URL= <YOUR API URL>
+```
+
+
 Install Database Tables Using following command:
 ```
 php artisan migrate 
 ```
+
+## Usage
+
 
 
 ## Security Vulnerabilities
