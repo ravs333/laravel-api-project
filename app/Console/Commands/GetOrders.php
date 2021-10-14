@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\Address;
 use App\Models\Product;
 use App\Models\OrderItems;
+use App\Models\ApiPage;
 
 
 class GetOrders extends Command
@@ -28,6 +29,20 @@ class GetOrders extends Command
      * @var string
      */
     protected $description = 'Get Orders List from Marketplace API';
+
+    /**
+     * Current page which being fetched.
+     *
+     * @var string
+     */
+    protected $page = 1;
+
+    /**
+     * Total Number of Pages in API Response
+     *
+     * @var string
+     */
+    protected $total;
 
     /**
      * Create a new command instance.
@@ -50,19 +65,46 @@ class GetOrders extends Command
         $marketplaceAPIKEY = env('DESPATCH_CLOUD_MARKETPLACE_API_KEY');
         $apiEndpoint = env('DESPATCH_CLOUD_MARKETPLACE_ORDER_ENDPOINT');
 
-        $url = $marketplaceBaseURL . $apiEndpoint . '?api_key=' . $marketplaceAPIKEY;
+        $response =  array();
+        $orders = array(
+            'inserted' => array(),
+            'updated' => array(),
+        );
 
-        Log::channel('api')->info('An informational message.');
+        //Save Current Page and Total Pages
+        $page = ApiPage::firstOrNew(['id' => 1], ["page" => 1, 'total' => 1]);
+        if(!$page->exists){
+            $response = $this->fetchOrders(1);
+            
+            $page->page = 2;
+            $page->total = $response['last_page'];
+            $page->created_at = date('Y-m-d H:i:s');
+            $page->updated_at = date('Y-m-d H:i:s');
+            $page->save();
 
-        $response =  Http::get($url)->throw(function ($response, $e) {
-            //
-        })->json();
+            $this->page = 2;
+            $this->total = $response['last_page'];
+            
+        }else{
+            $response = $this->fetchOrders($page->page);
+
+            if($page->page < $response['last_page']){
+                $page->page++;
+                $page->total = $response['last_page'];
+                $page->updated_at = date('Y-m-d H:i:s');
+                $page->save();
+            }
+            
+            $this->page = $page->page;
+            $this->total = $response['last_page'];
+        }
+
+        Log::channel('api')->info('Get Order List API:: ', array(
+            'url' => $marketplaceBaseURL . $apiEndpoint . '?api_key=' . $marketplaceAPIKEY . '&page=' . $page->page,
+            'response' => $response
+        ));
 
         if( isset($response['data']) && count($response['data']) ){
-            $orders = array(
-                'inserted' => array(),
-                'updated' => array(),
-            );
 
             foreach ($response['data'] as $apiOrder) {
                 $order = Order::firstOrNew(['id' => intval($apiOrder['id'])], $apiOrder);
@@ -76,9 +118,12 @@ class GetOrders extends Command
                 }else{
                     $apiEndpoint = env('DESPATCH_CLOUD_MARKETPLACE_ORDER_ENDPOINT') . $apiOrder['id'];
                     $url = $marketplaceBaseURL . $apiEndpoint . '?api_key=' . $marketplaceAPIKEY;
-                    $orderDetails =  Http::get($url)->throw(function ($response, $e) {
-                        //
-                    })->json();
+                    $orderDetails =  Http::get($url)->json();
+
+                    Log::channel('api')->info('Get Order Detail:: ', array(
+                        'url' => $url,
+                        'response' => $orderDetails
+                    ));
 
                     if( count($orderDetails) ){
 
@@ -160,8 +205,20 @@ class GetOrders extends Command
             }
         }
 
+        $this->info('Page No: ' . $page->page);
         $this->info('Inserted ' . count($orders['inserted']) . ' Orders.');
         $this->info('Updated ' . count($orders['updated']) . ' Orders.');
         return Command::SUCCESS;
+    }
+
+
+    private function fetchOrders(int $page = 1){
+        $marketplaceBaseURL = env('DESPATCH_CLOUD_MARKETPLACE_API_URL');
+        $marketplaceAPIKEY = env('DESPATCH_CLOUD_MARKETPLACE_API_KEY');
+        $apiEndpoint = env('DESPATCH_CLOUD_MARKETPLACE_ORDER_ENDPOINT');
+
+        $url = $marketplaceBaseURL . $apiEndpoint . '?api_key=' . $marketplaceAPIKEY . '&page=' . $page;
+
+        return Http::get($url)->json();
     }
 }
