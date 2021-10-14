@@ -51,7 +51,7 @@ class UpdateOrders extends Command
             $apiEndpoint = env('DESPATCH_CLOUD_MARKETPLACE_ORDER_ENDPOINT') . $pendingOrder['id'];
             $url = $marketplaceBaseURL . $apiEndpoint . '?api_key=' . $marketplaceAPIKEY;
             $response =  Http::post($url, ['type' => 'approved'])->json();
-            Log::channel('api')->info('Get Order List API:: ', array(
+            Log::channel('api')->info('Update Order API:: ', array(
                 'url' => $url,
                 'response' => $response
             ));
