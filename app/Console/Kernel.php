@@ -25,8 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('order:list')->hourly();
-        $schedule->command('order:update')->hourly();
+        $schedule->command('order:list')->everyMinute();
+        $schedule->command('order:update')->everyMinute();
     }
 
     /**
