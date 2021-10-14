@@ -14,10 +14,10 @@ class CreateCustomerTable extends Migration
     public function up()
     {
         Schema::create('customer', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->primary('id');
             $table->string('name');
             $table->string('email')->nullable();
-            $table->string('phone');
+            $table->string('phone')->nullable();
             $table->timestamps();
         });
     }
