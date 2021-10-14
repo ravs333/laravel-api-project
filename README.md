@@ -66,6 +66,14 @@ Start Scheduler by running following command:
 php artisan schedule:run
 ```
 
+Setup Cron Job on Server by adding a single entry to your server’s crontab file:
+```
+* * * * * php /path/to/artisan schedule:run 1>> /dev/null 2>&1
+
+OR
+
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+```
 
 ## Security Vulnerabilities
 
